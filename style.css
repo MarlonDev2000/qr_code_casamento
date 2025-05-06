@@ -1,0 +1,20 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 20px;
+  }
+  #reader {
+    width: 300px;
+    margin: 0 auto;
+  }
+  .status {
+    margin-top: 20px;
+    font-size: 1.2em;
+  }
+  .valido {
+    color: green;
+  }
+  .invalido {
+    color: red;
+  }
+  
