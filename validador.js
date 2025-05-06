@@ -1,8 +1,10 @@
 const statusDiv = document.getElementById("status");
 const startButton = document.getElementById("start-button");
+const cameraSelect = document.getElementById("camera-select");
 const readerDiv = document.getElementById("reader");
 
 let html5QrCode;
+let devices = [];
 
 function validarQRCode(codigo) {
   const convidado = convidados.find(c => c.codigo === codigo.trim());
@@ -28,35 +30,62 @@ startButton.addEventListener("click", async () => {
   statusDiv.textContent = "Solicitando acesso à câmera...";
 
   try {
-    const devices = await Html5Qrcode.getCameras();
+    devices = await Html5Qrcode.getCameras();
 
     if (devices.length === 0) {
       statusDiv.textContent = "❌ Nenhuma câmera encontrada!";
       return;
     }
 
-    // Buscar a câmera traseira, verificando o tipo de câmera
-    const rearCamera = devices.find(device => device.label.toLowerCase().includes("back") || device.facing === "environment");
+    // Popular o menu de seleção de câmera
+    cameraSelect.innerHTML = "<option value=''>Selecione uma câmera</option>"; // resetar lista
+    devices.forEach((device, index) => {
+      const option = document.createElement("option");
+      option.value = device.id;
+      option.text = device.label || `Câmera ${index + 1}`;
+      cameraSelect.appendChild(option);
+    });
 
-    if (!rearCamera) {
-      statusDiv.textContent = "❌ Não foi possível encontrar a câmera traseira.";
-      return;
-    }
+    // Mostrar o botão de start
+    startButton.style.display = "none";
+    cameraSelect.style.display = "block";
 
+    statusDiv.textContent = "📷 Escolha a câmera e clique em 'Iniciar'.";
+  } catch (err) {
+    statusDiv.textContent = `❌ Erro ao acessar câmeras: ${err.message}`;
+  }
+});
+
+cameraSelect.addEventListener("change", async () => {
+  const cameraId = cameraSelect.value;
+  
+  if (!cameraId) {
+    statusDiv.textContent = "❌ Nenhuma câmera selecionada!";
+    return;
+  }
+
+  statusDiv.textContent = "📷 Iniciando scanner...";
+
+  // Selecionar a câmera escolhida
+  const selectedCamera = devices.find(device => device.id === cameraId);
+
+  if (selectedCamera) {
     startButton.style.display = "none";
     readerDiv.style.display = "block";
 
     html5QrCode = new Html5Qrcode("reader");
 
-    await html5QrCode.start(
-      rearCamera.id,
-      { fps: 10, qrbox: 250 },
-      decodedText => validarQRCode(decodedText),
-      error => {} // ignora erros pequenos de leitura
-    );
+    try {
+      await html5QrCode.start(
+        selectedCamera.id,
+        { fps: 10, qrbox: 250 },
+        decodedText => validarQRCode(decodedText),
+        error => {} // ignora erros pequenos de leitura
+      );
 
-    statusDiv.textContent = "📷 Aguardando leitura...";
-  } catch (err) {
-    statusDiv.textContent = `❌ Erro ao acessar câmera: ${err.message}`;
+      statusDiv.textContent = "📷 Aguardando leitura...";
+    } catch (err) {
+      statusDiv.textContent = `❌ Erro ao iniciar o scanner: ${err.message}`;
+    }
   }
 });
