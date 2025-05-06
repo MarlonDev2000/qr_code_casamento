@@ -35,13 +35,21 @@ startButton.addEventListener("click", async () => {
       return;
     }
 
+    // Procurar pela câmera traseira
+    const rearCamera = devices.find(device => device.facing === "environment");
+
+    if (!rearCamera) {
+      statusDiv.textContent = "❌ Não foi possível encontrar a câmera traseira.";
+      return;
+    }
+
     startButton.style.display = "none";
     readerDiv.style.display = "block";
 
     html5QrCode = new Html5Qrcode("reader");
 
     await html5QrCode.start(
-      devices[0].id,
+      rearCamera.id,
       { fps: 10, qrbox: 250 },
       decodedText => validarQRCode(decodedText),
       error => {} // ignora erros pequenos de leitura
