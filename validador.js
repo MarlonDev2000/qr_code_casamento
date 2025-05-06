@@ -35,8 +35,8 @@ startButton.addEventListener("click", async () => {
       return;
     }
 
-    // Procurar pela câmera traseira
-    const rearCamera = devices.find(device => device.facing === "environment");
+    // Buscar a câmera traseira, verificando o tipo de câmera
+    const rearCamera = devices.find(device => device.label.toLowerCase().includes("back") || device.facing === "environment");
 
     if (!rearCamera) {
       statusDiv.textContent = "❌ Não foi possível encontrar a câmera traseira.";
