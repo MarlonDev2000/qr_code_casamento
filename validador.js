@@ -6,23 +6,19 @@ const readerDiv = document.getElementById("reader");
 let html5QrCode;
 let devices = [];
 
-function validarQRCode(codigo) {
-  const convidado = convidados.find(c => c.codigo === codigo.trim());
+// Definindo um único QR Code para todos os convidados
+const qrCode = "CONVITE123456";  // O QR Code será o mesmo para todos
 
-  if (!convidado) {
+function validarQRCode(codigo) {
+  // Verificando se o código escaneado é o mesmo que o convite
+  if (codigo.trim() !== qrCode) {
     statusDiv.textContent = "❌ Convite inválido!";
     statusDiv.className = "status invalido";
     return;
   }
 
-  if (convidado.validado) {
-    statusDiv.textContent = `⚠️ ${convidado.nome} já fez check-in.`;
-    statusDiv.className = "status invalido";
-    return;
-  }
-
-  convidado.validado = true;
-  statusDiv.textContent = `✅ Bem-vindo(a), ${convidado.nome}!`;
+  // Se for o código correto, mostrar o nome do convidado (pode ser nome genérico)
+  statusDiv.textContent = `✅ Bem-vindo(a), Convidado(a)!`;
   statusDiv.className = "status valido";
 }
 
